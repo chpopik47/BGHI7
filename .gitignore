@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Django
+*.log
+local_settings.py
+
+# SQLite / local data
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3
+
+# Backups
+*.bak
+*.bak-*
+
+# OS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Secrets
+.env
+.env.*
