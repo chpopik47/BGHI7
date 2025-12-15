@@ -37,7 +37,7 @@ def cleanup_topics(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("base", "0005_seed_categories_and_slugs"),
+        ("base", "0002_seed_categories_and_slugs"),
     ]
 
     operations = [

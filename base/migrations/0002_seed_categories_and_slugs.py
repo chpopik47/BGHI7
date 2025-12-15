@@ -44,7 +44,7 @@ def seed_categories(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("base", "0004_topic_slug_user_affiliation_invitationcode_postvote"),
+        ("base", "0001_initial"),
     ]
 
     operations = [
