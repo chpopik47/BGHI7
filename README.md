@@ -65,8 +65,34 @@ Open admin:
 ## Notes
 
 - Local SQLite DB (`db.sqlite3`) is intentionally not committed. Each developer will create their own via `migrate`.
-- Student registration is gated by the configured university email domain in settings (`UNIVERSITY_EMAIL_DOMAIN`).
-- The “Jobs & Referrals” topic is demo-gated by `User.is_paid`.
+- Student registration is gated by the configured university email domains (see below).
+- The "Jobs & Referrals" topic is demo-gated by `User.is_paid`.
+
+## Student Email Domains
+
+Students can register with emails from the following domains (no invitation code required):
+
+**Default domains:**
+- `th-deg.de`
+- `stud.th-deg.de`
+- `thi.de`
+- `stud.thi.de`
+
+**To add more domains**, set the `UNIVERSITY_EMAIL_DOMAINS` environment variable (comma-separated):
+
+```bash
+export UNIVERSITY_EMAIL_DOMAINS="th-deg.de,stud.th-deg.de,thi.de,stud.thi.de,newuni.edu"
+```
+
+Or in the systemd service file on the server:
+
+```ini
+Environment="UNIVERSITY_EMAIL_DOMAINS=th-deg.de,stud.th-deg.de,thi.de,stud.thi.de,newuni.edu"
+```
+
+If the env var is not set, the default domains above are used.
+
+Alumni (non-student emails) require a valid invitation code to register.
 
 ## API
 
