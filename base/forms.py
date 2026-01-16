@@ -5,6 +5,24 @@ from django.conf import settings
 from .models import Room, User
 from .models import InvitationCode
 
+
+def is_student_email(email):
+    """Check if email belongs to a university student domain."""
+    email = (email or '').strip().lower()
+    # Support list of domains (new) or single domain (legacy)
+    domains = getattr(settings, 'UNIVERSITY_EMAIL_DOMAINS', None)
+    if not domains:
+        # Fallback to single domain setting
+        domain = getattr(settings, 'UNIVERSITY_EMAIL_DOMAIN', '')
+        domains = [domain] if domain else []
+    
+    for domain in domains:
+        domain = domain.strip().lower()
+        if domain and email.endswith(f"@{domain}"):
+            return True
+    return False
+
+
 class MyUserCreationForm(UserCreationForm):
     invitation_code = forms.CharField(
         required=False,
@@ -27,10 +45,7 @@ class MyUserCreationForm(UserCreationForm):
         if not email:
             return cleaned_data
 
-        allowed_domain = getattr(settings, 'UNIVERSITY_EMAIL_DOMAIN', 'youruni.edu').lower().strip()
-        is_student = bool(allowed_domain) and email.endswith(f"@{allowed_domain}")
-
-        if is_student:
+        if is_student_email(email):
             return cleaned_data
 
         code = (cleaned_data.get('invitation_code') or '').strip()
@@ -49,12 +64,9 @@ class MyUserCreationForm(UserCreationForm):
         user.username = (user.username or '').lower()
         user.email = (user.email or '').lower()
 
-        allowed_domain = getattr(settings, 'UNIVERSITY_EMAIL_DOMAIN', 'youruni.edu').lower().strip()
-        is_student = bool(allowed_domain) and user.email.endswith(f"@{allowed_domain}")
-
         invite = None
         code = (self.cleaned_data.get('invitation_code') or '').strip()
-        if not is_student:
+        if not is_student_email(user.email):
             invite = InvitationCode.objects.filter(code=code, is_active=True, used_at__isnull=True).first()
             user.affiliation = User.Affiliation.ALUMNI
         else:

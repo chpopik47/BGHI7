@@ -19,6 +19,21 @@ class MyUserCreationFormTests(TestCase):
         user = form.save()
         self.assertEqual(user.affiliation, User.Affiliation.STUDENT)
 
+    def test_student_stud_domain_does_not_require_invitation_code(self):
+        """Students with @stud.th-deg.de emails should also register without invitation code."""
+        form = MyUserCreationForm(
+            data={
+                "name": "Student Stud",
+                "username": "student_stud",
+                "email": "student@stud.th-deg.de",
+                "password1": "StrongPass123!",
+                "password2": "StrongPass123!",
+            }
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+        user = form.save()
+        self.assertEqual(user.affiliation, User.Affiliation.STUDENT)
+
     def test_alumni_email_requires_valid_invitation_code(self):
         InvitationCode.objects.create(code="INVITE123")
 

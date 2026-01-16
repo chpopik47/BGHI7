@@ -163,6 +163,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 
 # University-only community settings
-# Students can sign up with emails ending in this domain.
+# Students can sign up with emails ending in any of these domains.
 # Alumni can sign up with any email, but must provide a valid invitation code.
+UNIVERSITY_EMAIL_DOMAINS = ['th-deg.de', 'stud.th-deg.de']
+# Backwards compatibility
 UNIVERSITY_EMAIL_DOMAIN = 'th-deg.de'

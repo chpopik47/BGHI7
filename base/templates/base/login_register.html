@@ -131,15 +131,18 @@
 
         <script>
           (function () {
-            var allowedDomain = "{{ university_domain|default:'th-deg.de' }}".toLowerCase().trim();
+            var allowedDomains = [{% for d in university_domains %}"{{ d|lower }}",{% endfor %}];
+            if (!allowedDomains.length) allowedDomains = ["th-deg.de", "stud.th-deg.de"];
             var emailInput = document.getElementById('id_email');
             var invitationGroup = document.getElementById('invitation-code-group');
             var invitationInput = document.getElementById('id_invitation_code');
 
             function isStudentEmail(email) {
-              if (!allowedDomain) return false;
               var value = (email || '').toLowerCase().trim();
-              return value.endsWith('@' + allowedDomain);
+              for (var i = 0; i < allowedDomains.length; i++) {
+                if (value.endsWith('@' + allowedDomains[i])) return true;
+              }
+              return false;
             }
 
             function updateInvitationVisibility() {

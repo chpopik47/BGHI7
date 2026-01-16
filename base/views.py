@@ -72,8 +72,12 @@ def registerPage(request):
         else:
             messages.error(request, 'An error occured during registration') 
 
-    university_domain = getattr(settings, 'UNIVERSITY_EMAIL_DOMAIN', 'youruni.edu')
-    return render(request, 'base/login_register.html', {'form': form, 'university_domain': university_domain})
+    university_domains = getattr(settings, 'UNIVERSITY_EMAIL_DOMAINS', None)
+    if not university_domains:
+        # Fallback to single domain
+        domain = getattr(settings, 'UNIVERSITY_EMAIL_DOMAIN', 'youruni.edu')
+        university_domains = [domain] if domain else []
+    return render(request, 'base/login_register.html', {'form': form, 'university_domains': university_domains})
 
 @login_required(login_url='login')
 def home(request):
