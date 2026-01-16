@@ -165,6 +165,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 # University-only community settings
 # Students can sign up with emails ending in any of these domains.
 # Alumni can sign up with any email, but must provide a valid invitation code.
-UNIVERSITY_EMAIL_DOMAINS = ['th-deg.de', 'stud.th-deg.de']
+# Can be overridden via environment variable (comma-separated): UNIVERSITY_EMAIL_DOMAINS
+_default_domains = ['th-deg.de', 'stud.th-deg.de', 'thi.de', 'stud.thi.de']
+_env_domains = os.getenv('UNIVERSITY_EMAIL_DOMAINS', '')
+UNIVERSITY_EMAIL_DOMAINS = [d.strip().lower() for d in _env_domains.split(',') if d.strip()] or _default_domains
 # Backwards compatibility
-UNIVERSITY_EMAIL_DOMAIN = 'th-deg.de'
+UNIVERSITY_EMAIL_DOMAIN = UNIVERSITY_EMAIL_DOMAINS[0] if UNIVERSITY_EMAIL_DOMAINS else 'th-deg.de'
