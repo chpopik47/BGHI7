@@ -68,9 +68,6 @@ pipeline {
     }
 
     stage('Deploy App') {
-      when {
-        branch 'main'
-      }
       steps {
         sh '''
           set -e
