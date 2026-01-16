@@ -74,30 +74,35 @@ pipeline {
           
           # Create app directory if it doesn't exist
           sudo mkdir -p "$APP_DIR"
-          sudo chown "$APP_USER:$APP_USER" "$APP_DIR"
           
-          # Sync app files (excluding .git, __pycache__, .venv, db.sqlite3)
-          rsync -av --delete \
+          # Sync app files using sudo (excluding .git, __pycache__, .venv, db.sqlite3)
+          sudo rsync -av --delete \
             --exclude '.git' \
             --exclude '__pycache__' \
             --exclude '.venv' \
+            --exclude 'venv' \
+            --exclude 'staticfiles' \
             --exclude 'coverage_html' \
             --exclude 'coverage.xml' \
             --exclude '*.pyc' \
+            --exclude 'db.sqlite3' \
             . "$APP_DIR/"
           
-          # Setup venv in app directory
+          # Set ownership to app user
+          sudo chown -R "$APP_USER:$APP_USER" "$APP_DIR"
+          
+          # Setup venv in app directory (run as app user)
           cd "$APP_DIR"
-          python3 -m venv venv
-          venv/bin/pip install --upgrade pip
-          venv/bin/pip install -r requirements.txt
-          venv/bin/pip install gunicorn
+          sudo -u "$APP_USER" python3 -m venv venv
+          sudo -u "$APP_USER" venv/bin/pip install --upgrade pip
+          sudo -u "$APP_USER" venv/bin/pip install -r requirements.txt
+          sudo -u "$APP_USER" venv/bin/pip install gunicorn
           
           # Run migrations
-          venv/bin/python manage.py migrate --noinput
+          sudo -u "$APP_USER" venv/bin/python manage.py migrate --noinput
           
           # Collect static files
-          venv/bin/python manage.py collectstatic --noinput
+          sudo -u "$APP_USER" venv/bin/python manage.py collectstatic --noinput
           
           # Setup systemd service for gunicorn
           sudo tee /etc/systemd/system/bghi7.service > /dev/null << 'SERVICEEOF'
@@ -112,7 +117,7 @@ WorkingDirectory=/opt/bghi7
 Environment="DJANGO_SECRET_KEY=jenkins-prod-secret-change-me-12345"
 Environment="DJANGO_DEBUG=False"
 Environment="DJANGO_ALLOWED_HOSTS=*"
-ExecStart=/opt/bghi7/venv/bin/gunicorn --workers 2 --bind 127.0.0.1:8000 webappname.wsgi:application
+ExecStart=/opt/bghi7/venv/bin/gunicorn --workers 1 --bind 127.0.0.1:8000 webappname.wsgi:application
 Restart=always
 RestartSec=3
 
