@@ -48,7 +48,7 @@ If you ran `seed_demo_data`, use:
 
 - Student:
   - `student1@th-deg.de` / `student123`
-  - `student2@th-deg.de` / `student123`
+
 - Alumni:
   - `alumni1@gmail.com` / `alumni123`
 
@@ -99,75 +99,13 @@ Alumni (non-student emails) require a valid invitation code to register.
 - API routes are mounted at `/api/` (see `GET /api`).
 - Most API endpoints require authentication (`IsAuthenticated`). The simplest way in local dev is to log in via the web UI first, then call the API using the same session/cookies.
 
-## CI/CD (Jenkins + PythonAnywhere, $0 demo)
+## CI/CD (Jenkins + AWS Free Tier)
 
 This repo includes a Jenkins pipeline in [Jenkinsfile](Jenkinsfile) that:
 
-- Polls the Git repo (every ~2 minutes) for new commits
+- Polls the Git repo (every ~2 minutes) for new commits (or use GitHub webhooks)
 - Runs Django checks, migrations, tests, and coverage
-- Deploys to PythonAnywhere via SSH (if configured)
-
-### 1) Run Jenkins locally
-
-You can run Jenkins on your own machine for free.
-
-One simple way is Docker:
-
-- Install Docker Desktop
-- Run Jenkins:
-
-  - `docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts-jdk17`
-
-Open `http://localhost:8080` and follow the setup wizard.
-
-### 2) Create the Jenkins job
-
-Create a **Pipeline** job pointing to this repo and set:
-
-- Definition: Pipeline script from SCM
-- SCM: Git
-- Repository: `https://github.com/Amit021/BGHI7.git`
-- Branch: `*/main`
-- Script path: `Jenkinsfile`
-
-The pipeline uses **polling** (not GitHub webhooks), so Jenkins does not need to be publicly reachable.
-
-### 3) Configure PythonAnywhere deploy (optional)
-
-To deploy automatically, Jenkins needs SSH access to your PythonAnywhere account.
-
-1) Verify SSH works from your machine:
-
-- `ssh <your_pythonanywhere_username>@ssh.pythonanywhere.com`
-
-2) Create a deploy script on PythonAnywhere (example path `~/deploy_bghi7.sh`) that:
-
-- `git pull` (or `git reset --hard origin/main`)
-- installs requirements
-- runs `python manage.py migrate --noinput`
-- runs `python manage.py collectstatic --noinput`
-- reloads the app by touching your WSGI file
-
-3) Add an SSH key for Jenkins:
-
-- Generate a key on the Jenkins machine
-- Add the public key in PythonAnywhere (Account → SSH keys)
-- Add the private key to Jenkins Credentials as “SSH Username with private key”
-  - Credentials ID must be: `pythonanywhere-ssh`
-
-4) Set Jenkins environment variables for the job:
-
-- `PA_USER` = your PythonAnywhere username (example: `amit21`)
-- `PA_DEPLOY_SCRIPT` = path to the deploy script (default: `~/deploy_bghi7.sh`)
-
-If `PA_USER` is not set, the deploy stage is skipped.
-
-> Note: On PythonAnywhere free accounts, SSH may not allow non-interactive remote commands.
-> If `ssh user@ssh.pythonanywhere.com 'echo OK'` does not print `OK`, Jenkins cannot redeploy automatically via SSH.
-
-## CI/CD (Jenkins + AWS Free Tier)
-
-If you want fully automatic redeploy on every push without paying for hosting, you can run Jenkins and the app on an AWS Free Tier EC2 instance.
+- Deploys to the server automatically
 
 ### 0) Avoid surprise charges
 
