@@ -28,8 +28,7 @@ urlpatterns = [
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# Serve media files in production (when DEBUG=False)
-if not settings.DEBUG:
-    urlpatterns += [
-        re_path(r'^images/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
-    ]
+# Always serve media files (needed for production when static() doesn't work)
+urlpatterns += [
+    re_path(r'^images/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]

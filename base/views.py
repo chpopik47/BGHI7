@@ -353,6 +353,7 @@ def deleteRoom(request, pk):
 
 
 @login_required(login_url= 'login')
+@login_required(login_url='login')
 def deleteMessage(request, pk):
     message = Message.objects.get(id=pk)
 
