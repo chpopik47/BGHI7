@@ -1,0 +1,23 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="layout layout--2">
+  <div class="container">
+    <div class="layout__box">
+      <div class="layout__boxHeader">
+        <h3>Delete</h3>
+      </div>
+      <div class="layout__body">
+        <form method="POST">
+          {% csrf_token %}
+          <p style="margin-bottom: 1.5rem;">Are you sure you want to delete "{{ obj }}"?</p>
+          <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn--main">Confirm</button>
+            <a href="javascript:history.back()" class="btn btn--dark">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock content %}

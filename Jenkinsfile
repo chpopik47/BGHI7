@@ -76,6 +76,7 @@ pipeline {
           sudo mkdir -p "$APP_DIR"
           
           # Sync app files using sudo (excluding .git, __pycache__, .venv, db.sqlite3)
+          # Preserve uploaded files in static/images subdirectories
           sudo rsync -av --delete \
             --exclude '.git' \
             --exclude '__pycache__' \
@@ -86,6 +87,8 @@ pipeline {
             --exclude 'coverage.xml' \
             --exclude '*.pyc' \
             --exclude 'db.sqlite3' \
+            --exclude 'static/images/attachments' \
+            --exclude 'static/images/comment_attachments' \
             . "$APP_DIR/"
           
           # Set ownership to app user
@@ -133,6 +136,10 @@ server {
 
     location /static/ {
         alias /opt/bghi7/staticfiles/;
+    }
+
+    location /images/ {
+        alias /opt/bghi7/static/images/;
     }
 
     location / {
